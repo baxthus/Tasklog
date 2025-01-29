@@ -27,14 +27,17 @@ const notes = useLazyAsyncData(async () => {
 });
 
 const search = ref('');
+const filterFavorite = ref(false);
 
 const filteredNotes = computed(() => {
   if (!notes.data.value) return [];
-  return notes.data.value.filter(note =>
-    Object.keys(note).filter(key => !['id', 'favorite', 'user'].includes(key)).some(key =>
+  return notes.data.value.filter((note) => {
+    const matchesSearch = Object.keys(note).filter(key => !['id', 'favorite', 'user'].includes(key)).some(key =>
       note[key as keyof typeof note]?.toString().toLowerCase().includes(search.value.toLowerCase()),
-    ),
-  );
+    );
+    const matchesFavorite = !filterFavorite.value || note.favorite;
+    return matchesSearch && matchesFavorite;
+  });
 });
 
 type CleanNote = Omit<Tables<'notes'>, 'id' | 'created_at' | 'user'>;
@@ -160,7 +163,7 @@ async function deleteNote() {
         @click="selected = undefined, mode = 'create'; visible = true"
       />
     </h1>
-    <div class="flex gap-4 w-fit my-3">
+    <div class="flex gap-4 w-fit my-3 items-center">
       <InputGroup>
         <InputText v-model="search" placeholder="Search" size="small" />
         <Button
@@ -171,6 +174,12 @@ async function deleteNote() {
           @click="search = ''"
         />
       </InputGroup>
+      <!-- i don't like the implementation of this button :( -->
+      <button
+        class="px-0.5 mb-1 text-xl"
+        :class="filterFavorite ? 'pi pi-star-fill' : 'pi pi-star'"
+        @click="filterFavorite = !filterFavorite"
+      />
     </div>
     <DataView :value="filteredNotes" data-key="id" unstyled class="mt-4">
       <template #list="{ items }">
