@@ -16,29 +16,11 @@ const loginSchema = z.object({
 
 const resolver = ref(zodResolver(loginSchema));
 const loading = ref(false);
-const captchaToken = ref<string>();
 
 async function onFormSubmit({ valid, values }: FormSubmitEvent) {
   if (!valid) return;
 
   loading.value = true;
-
-  const response = await $fetch('/_turnstile/validate', {
-    method: 'POST',
-    body: {
-      token: captchaToken.value,
-    },
-  });
-  if (!response.success) {
-    toast.add({
-      summary: 'Error logging in',
-      detail: 'Invalid captcha token',
-      severity: 'error',
-      life: 3000,
-    });
-    loading.value = false;
-    return;
-  }
 
   const { error } = await supabase.auth.signInWithPassword({
     email: values.email,
@@ -66,23 +48,6 @@ async function onFormSubmit({ valid, values }: FormSubmitEvent) {
 
 async function signInWithGithub() {
   loading.value = true;
-
-  const response = await $fetch('/_turnstile/validate', {
-    method: 'POST',
-    body: {
-      token: captchaToken.value,
-    },
-  });
-  if (!response.success) {
-    toast.add({
-      summary: 'Error logging in',
-      detail: 'Invalid captcha token',
-      severity: 'error',
-      life: 3000,
-    });
-    loading.value = false;
-    return;
-  }
 
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
@@ -126,15 +91,8 @@ async function signInWithGithub() {
             {{ $field.error?.message }}
           </Message>
         </FormField>
-        <NuxtTurnstile v-model="captchaToken" />
-        <Button type="submit" label="Login" :loading :disabled="!$form.valid || loading || !captchaToken" />
-        <Button
-          label="Login with Github"
-          icon="pi pi-github"
-          severity="secondary"
-          :disabled="!captchaToken"
-          @click="signInWithGithub"
-        />
+        <Button type="submit" label="Login" :loading :disabled="!$form.valid || loading" />
+        <Button label="Login with Github" icon="pi pi-github" severity="secondary" @click="signInWithGithub" />
       </Form>
     </Panel>
   </div>
