@@ -1,10 +1,7 @@
 <script>
 const supabase = useSupabaseClient();
 
-onMounted(async () => {
-  await supabase.auth.signOut();
-  navigateTo('/login');
-});
+supabase.auth.signOut().then(() => navigateTo('/login'));
 </script>
 
 <template>
