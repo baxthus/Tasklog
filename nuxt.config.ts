@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@nuxt/fonts',
     '@nuxtjs/supabase',
+    '@nuxtjs/turnstile',
   ],
   devtools: { enabled: true },
 
@@ -57,5 +58,9 @@ export default defineNuxtConfig({
       login: '/login',
       callback: '/auth/callback',
     },
+  },
+
+  turnstile: {
+    addValidateEndpoint: true,
   },
 });
