@@ -197,7 +197,7 @@ async function deleteNote() {
             <p class="text-sm">
               {{ new Date(note.created_at).toLocaleString() }}
             </p>
-            <Badge v-if="note.favorite" severity="warn">
+            <Badge v-if="note.favorite" class="w-fit self-center">
               Favorite
             </Badge>
           </button>

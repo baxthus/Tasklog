@@ -4,7 +4,7 @@ const user = useSupabaseUser();
 
 <template>
   <div class="flex items-center gap-4">
-    <Avatar :image="user?.user_metadata.avatar_url" size="xlarge" shape="circle" />
+    <Avatar :image="user?.user_metadata.avatar_url" shape="circle" class="size-20" />
     <div class="flex flex-col">
       <span class="text-lg font-bold">
         {{ user?.user_metadata.user_name ?? 'User' }}
