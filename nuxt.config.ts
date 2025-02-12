@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     '@nuxt/fonts',
     '@nuxtjs/supabase',
   ],
+  ssr: false,
   devtools: { enabled: true },
 
   app: {
