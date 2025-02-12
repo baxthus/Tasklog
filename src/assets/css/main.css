@@ -1,6 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@plugin "tailwindcss-primeui";
+
+@theme {
+  --font-custom: 'Geist', sans-serif;
+}
 
 * {
   @apply font-custom;
