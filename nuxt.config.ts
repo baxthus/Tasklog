@@ -1,3 +1,4 @@
+import tailwindcss from '@tailwindcss/vite';
 import localization from './src/assets/primevue/localization';
 import theme from './src/assets/primevue/theme';
 
@@ -5,7 +6,6 @@ import theme from './src/assets/primevue/theme';
 export default defineNuxtConfig({
   modules: [
     '@nuxt/eslint',
-    '@nuxtjs/tailwindcss',
     '@primevue/nuxt-module',
     '@nuxt/fonts',
     '@nuxtjs/supabase',
@@ -17,10 +17,15 @@ export default defineNuxtConfig({
       title: 'Tasklog',
     },
   },
+  css: ['~/assets/css/main.css'],
 
   srcDir: 'src/',
   serverDir: 'src/server/',
   compatibilityDate: '2024-11-01',
+
+  vite: {
+    plugins: [tailwindcss()],
+  },
 
   eslint: {
     config: {
@@ -46,6 +51,12 @@ export default defineNuxtConfig({
     options: {
       theme: {
         preset: theme,
+        options: {
+          cssLayer: {
+            name: 'primevue',
+            order: 'base, primevue',
+          },
+        },
       },
       ripple: true,
       locale: localization,
