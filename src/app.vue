@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import 'primeicons/primeicons.css';
+import { Toaster } from 'vue-sonner';
 </script>
 
 <template>
@@ -7,6 +8,6 @@ import 'primeicons/primeicons.css';
     <NuxtPage />
   </div>
 
-  <Toast position="bottom-right" />
+  <Toaster position="top-right" theme="dark" rich-colors />
   <ConfirmDialog />
 </template>

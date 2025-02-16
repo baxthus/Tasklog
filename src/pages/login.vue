@@ -2,10 +2,10 @@
 import { z } from 'zod';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
 import type { FormSubmitEvent } from '@primevue/forms';
+import { toast } from 'vue-sonner';
 import { passwordSchema } from '~/types/password';
 
 const supabase = useSupabaseClient();
-const toast = useToast();
 
 const loginSchema = z.object({
   email: z.string({
@@ -28,25 +28,18 @@ async function onFormSubmit({ valid, values }: FormSubmitEvent) {
   });
   loading.value = false;
   if (error) {
-    toast.add({
-      summary: 'Error logging in',
-      detail: error.message,
-      severity: 'error',
-      life: 3000,
+    toast.error('Error logging in', {
+      description: error.message,
     });
     return;
   }
 
-  toast.add({
-    summary: 'Logged in',
-    severity: 'success',
-    life: 3000,
-  });
+  toast.success('Logged in');
 
   navigateTo('/');
 }
 
-async function signInWithGithub() {
+async function signInWithGitHub() {
   loading.value = true;
 
   const { error } = await supabase.auth.signInWithOAuth({
@@ -57,11 +50,8 @@ async function signInWithGithub() {
   });
   loading.value = false;
   if (error) {
-    toast.add({
-      summary: 'Error logging in',
-      detail: error.message,
-      severity: 'error',
-      life: 3000,
+    toast.error('Error logging in', {
+      description: error.message,
     });
     return;
   }
@@ -92,7 +82,7 @@ async function signInWithGithub() {
           </Message>
         </FormField>
         <Button type="submit" label="Login" :loading :disabled="!$form.valid || loading" />
-        <Button label="Login with Github" icon="pi pi-github" severity="secondary" @click="signInWithGithub" />
+        <Button label="Login with GitHub" icon="pi pi-github" severity="secondary" @click="signInWithGitHub" />
       </Form>
     </Panel>
   </div>

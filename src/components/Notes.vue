@@ -1,23 +1,19 @@
 <script setup lang="ts">
 import type { FormSubmitEvent } from '@primevue/forms';
 import { zodResolver } from '@primevue/forms/resolvers/zod';
-import type { ToastMessageOptions } from 'primevue';
 import type { MenuItem } from 'primevue/menuitem';
 import { z } from 'zod';
+import { toast } from 'vue-sonner';
 import type { Database, Tables } from '~/types/database';
 
 const supabase = useSupabaseClient<Database>();
-const toast = useToast();
 const confirm = useConfirm();
 
 const notes = useLazyAsyncData(async () => {
   const { data, error } = await supabase.from('notes').select();
   if (error) {
-    toast.add({
-      summary: 'Error fetching notes',
-      detail: error.message,
-      severity: 'error',
-      life: 3000,
+    toast.error('Error fetching notes', {
+      description: error.message,
     });
     return [];
   }
@@ -84,11 +80,7 @@ async function onFormSubmit({ valid, values }: FormSubmitEvent) {
   if (mode.value === 'edit') {
     const isChanged = Object.keys(values).some(key => values[key] !== selected.value![key as keyof typeof selected.value]);
     if (!isChanged) {
-      toast.add({
-        summary: 'No changes',
-        severity: 'info',
-        life: 3000,
-      });
+      toast.info('No changes');
       loading.value = false;
       return;
     }
@@ -101,20 +93,13 @@ async function onFormSubmit({ valid, values }: FormSubmitEvent) {
   const { error } = await action;
   loading.value = false;
   if (error) {
-    toast.add({
-      summary: 'Error saving note',
-      detail: error.message,
-      severity: 'error',
-      life: 3000,
+    toast.error('Error saving note', {
+      description: error.message,
     });
     return;
   }
 
-  toast.add({
-    summary: 'Note saved',
-    severity: 'success',
-    life: 3000,
-  });
+  toast.success('Note saved');
   visible.value = false;
   notes.refresh();
 }
@@ -122,31 +107,18 @@ async function onFormSubmit({ valid, values }: FormSubmitEvent) {
 async function deleteNote() {
   if (!selected.value) return;
 
-  const loadingToast: ToastMessageOptions = {
-    summary: 'Deleting note',
-    detail: 'Please wait...',
-    severity: 'info',
-    closable: false,
-  };
-  toast.add(loadingToast);
+  const loadingToast = toast.loading('Deleting note');
 
   const { error } = await supabase.from('notes').delete().eq('id', selected.value.id);
-  toast.remove(loadingToast);
+  toast.dismiss(loadingToast);
   if (error) {
-    toast.add({
-      summary: 'Error deleting note',
-      detail: error.message,
-      severity: 'error',
-      life: 3000,
+    toast.error('Error deleting note', {
+      description: error.message,
     });
     return;
   }
 
-  toast.add({
-    summary: 'Note deleted',
-    severity: 'success',
-    life: 3000,
-  });
+  toast.success('Note deleted');
   notes.refresh();
 }
 </script>
