@@ -40,7 +40,6 @@ const filteredNotes = computed(() => {
   });
 });
 
-type CleanNote = Omit<Tables<'notes'>, 'id' | 'created_at' | 'user'>;
 const noteSchema = z.object({
   name: z.string(),
   content: z.string().nullable().optional(),
@@ -96,7 +95,7 @@ async function onFormSubmit({ valid, values }: FormSubmitEvent) {
   }
 
   const action = mode.value === 'create'
-    ? supabase.from('notes').insert(values as CleanNote)
+    ? supabase.from('notes').insert(values as z.infer<typeof noteSchema>)
     : supabase.from('notes').update(values).eq('id', selected.value!.id);
 
   const { error } = await action;
@@ -183,11 +182,11 @@ async function deleteNote() {
     </div>
     <DataView :value="filteredNotes" data-key="id" unstyled class="mt-4">
       <template #list="{ items }">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="flex flex-col gap-4">
           <button
             v-for="note in items"
             :key="note.id"
-            class="px-4 py-3 border border-neutral-800 rounded-lg shadow-sm flex flex-col gap-2 bg-highlight hover:bg-highlight-emphasis"
+            class="px-4 py-3 border border-neutral-800 rounded-lg shadow-sm flex flex-col gap-2 bg-highlight hover:bg-highlight-emphasis hover:cursor-pointer w-fit"
             @contextmenu="selected = note; menu.show($event)"
             @click="selected = note; mode = 'view'; visible = true"
           >
@@ -195,7 +194,13 @@ async function deleteNote() {
               {{ note.name }}
             </h2>
             <p class="text-sm">
-              {{ new Date(note.created_at).toLocaleString() }}
+              <!-- Prevent hydration mismatch -->
+              <ClientOnly>
+                {{ new Date(note.created_at).toLocaleString(undefined, {
+                  dateStyle: 'medium',
+                  timeStyle: 'short',
+                }) }}
+              </ClientOnly>
             </p>
             <Badge v-if="note.favorite" class="w-fit self-center">
               Favorite
